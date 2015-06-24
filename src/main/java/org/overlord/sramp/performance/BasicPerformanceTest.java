@@ -16,7 +16,8 @@ package org.overlord.sramp.performance;
 
 import org.apache.commons.io.IOUtils;
 import org.artificer.atom.archive.ArtificerArchive;
-import org.artificer.common.ArtifactType;
+import org.artificer.common.query.ArtifactSummary;
+import org.artificer.repository.query.PagedResult;
 import org.artificer.server.core.api.ArtifactService;
 import org.artificer.server.core.api.BatchService;
 import org.artificer.server.core.api.QueryService;
@@ -26,7 +27,6 @@ import org.oasis_open.docs.s_ramp.ns.s_ramp_v1.XsdDocument;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.util.List;
 import java.util.Properties;
 
 public class BasicPerformanceTest {
@@ -36,6 +36,7 @@ public class BasicPerformanceTest {
             Properties jndiProps = new Properties();
             jndiProps.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
             jndiProps.put(Context.PROVIDER_URL, "http-remoting://localhost:8080");
+//            jndiProps.put(Context.PROVIDER_URL, "remote://localhost:4447");
             jndiProps.put(Context.SECURITY_PRINCIPAL, "admin");
             jndiProps.put(Context.SECURITY_CREDENTIALS, "artificer1!");
             jndiProps.put("jboss.naming.client.ejb.context", true);
@@ -67,7 +68,7 @@ public class BasicPerformanceTest {
 
         for (int i = 0; i < 1000; i++) {
             if (i % 100 == 0) {
-                System.out.println("i: " + i);
+                System.out.println("upload progress: " + i);
             }
 
             XsdDocument xsdDocument = new XsdDocument();
@@ -86,7 +87,7 @@ public class BasicPerformanceTest {
 
         for (int i = 0; i < 1000; i++) {
             if (i % 100 == 0) {
-                System.out.println("i: " + i);
+                System.out.println("batch upload progress: " + i);
                 if (i > 0) {
                     batchService.upload(archive);
                 }
@@ -104,8 +105,8 @@ public class BasicPerformanceTest {
 
     private static void queryTest(ArtifactService artifactService, QueryService queryService) throws Exception {
         long start = System.currentTimeMillis();
-        List<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument");
-        BaseArtifactType artifact = artifactResults.get(0);
+        PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument");
+        ArtifactSummary artifact = artifactResults.getResults().get(0);
         long end = System.currentTimeMillis();
         System.out.printf("Find all completed in %dms%n", end - start);
 
@@ -120,39 +121,58 @@ public class BasicPerformanceTest {
         System.out.printf("Query by UUID completed in %dms%n", end - start);
 
         start = System.currentTimeMillis();
-        artifact = artifactService.getMetaData(ArtifactType.valueOf(artifact), artifact.getUuid());
+        BaseArtifactType baseArtifactType = artifactService.getMetaData(artifact.getArtifactType(), artifact.getUuid());
         end = System.currentTimeMillis();
         System.out.printf("Get metadata by UUID completed in %dms%n", end - start);
 
+        // Please keep the following.  It's essentially the above, but in loops useful for profiling.
+
+//        String uuid = "";
 //        for (int i = 0; i < 1000; i++) {
 //            if (i % 100 == 0) {
-//                System.out.println("i: " + i);
+//                System.out.println("query progress: " + i);
 //            }
+//            // use paging
+//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument", null, null, null, null, null);
+//            uuid = artifactResults.getResults().get(0).getUuid();
+//        }
 //
-//            List<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument");
-////            System.out.println("XsdDocument: " + artifactResults.size());
-//            String uuid = artifactResults.get(0).getUuid();
-//            artifactResults = queryService.query("/s-ramp/xsd/XsdDocument[@uuid='" + uuid + "']");
-////            System.out.println("XsdDocument w/ UUID: " + artifactResults.size());
-//            artifactResults = queryService.query("/s-ramp/xsd[relatedDocument[@uuid='" + uuid + "']]");
-////            System.out.println("derived: " + artifactResults.size());
-//            artifactResults = queryService.query("/s-ramp/xsd/relatedDocument");
+//        for (int i = 0; i < 1000; i++) {
+//            if (i % 100 == 0) {
+//                System.out.println("find by uuid progress: " + i);
+//            }
+//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument[@uuid='" + uuid + "']");
+//        }
+//        for (int i = 0; i < 1000; i++) {
+//            if (i % 100 == 0) {
+//                System.out.println("query by relationship pred progress: " + i);
+//            }
+//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd[relatedDocument[@uuid='" + uuid + "']]");
+//        }
+//        for (int i = 0; i < 1000; i++) {
+//            if (i % 100 == 0) {
+//                System.out.println("query by relationship path progress: " + i);
+//            }
+//            // use paging
+//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/ComplexTypeDeclaration/relatedDocument", null, null, null, null, null);
 //        }
     }
 
     private static void fullTextSearchTest(QueryService queryService) throws Exception {
         long start = System.currentTimeMillis();
-        List<BaseArtifactType> artifactResults = queryService.query("/s-ramp[xp2:matches(., 'Purchase order schema')]");
+        PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp[xp2:matches(., 'Purchase order schema')]");
         long end = System.currentTimeMillis();
         System.out.printf("Full text search completed in %dms%n", end - start);
 
+        // Please keep the following.  It's essentially the above, but in a loop useful for profiling.
+
 //        for (int i = 0; i < 1000; i++) {
 //            if (i % 100 == 0) {
-//                System.out.println("i: " + i);
+//                System.out.println("full text progress: " + i);
 //            }
 //
-//            List<BaseArtifactType> artifactResults = queryService.query("/s-ramp[xp2:matches(., 'Purchase order schema')]");
-////            System.out.println("XsdDocument: " + artifactResults.size());
+//            // use paging
+//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp[xp2:matches(., 'Purchase order schema')]", null, null, null, null, null);
 //        }
     }
 }

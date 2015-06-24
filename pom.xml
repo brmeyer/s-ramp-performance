@@ -19,6 +19,13 @@
       <version>8.2.0.Final</version>
       <type>pom</type>
     </dependency>
+    <!--<dependency>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-ejb-client-bom</artifactId>
+      <version>7.2.0.Final</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>-->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-search-orm</artifactId>
