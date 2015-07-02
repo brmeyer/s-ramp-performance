@@ -132,8 +132,7 @@ public class BasicPerformanceTest {
 //            if (i % 100 == 0) {
 //                System.out.println("query progress: " + i);
 //            }
-//            // use paging
-//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument", null, null, null, null, null);
+//            PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument");
 //            uuid = artifactResults.getResults().get(0).getUuid();
 //        }
 //
@@ -141,20 +140,20 @@ public class BasicPerformanceTest {
 //            if (i % 100 == 0) {
 //                System.out.println("find by uuid progress: " + i);
 //            }
-//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument[@uuid='" + uuid + "']");
+//            PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp/xsd/XsdDocument[@uuid='" + uuid + "']");
 //        }
 //        for (int i = 0; i < 1000; i++) {
 //            if (i % 100 == 0) {
 //                System.out.println("query by relationship pred progress: " + i);
 //            }
-//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd[relatedDocument[@uuid='" + uuid + "']]");
+//            PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp/xsd[relatedDocument[@uuid='" + uuid + "']]");
 //        }
 //        for (int i = 0; i < 1000; i++) {
 //            if (i % 100 == 0) {
 //                System.out.println("query by relationship path progress: " + i);
 //            }
 //            // use paging
-//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp/xsd/ComplexTypeDeclaration/relatedDocument", null, null, null, null, null);
+//            PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp/xsd/ComplexTypeDeclaration/relatedDocument");
 //        }
     }
 
@@ -172,7 +171,7 @@ public class BasicPerformanceTest {
 //            }
 //
 //            // use paging
-//            PagedResult<BaseArtifactType> artifactResults = queryService.query("/s-ramp[xp2:matches(., 'Purchase order schema')]", null, null, null, null, null);
+//            PagedResult<ArtifactSummary> artifactResults = queryService.query("/s-ramp[xp2:matches(., 'Purchase order schema')]");
 //        }
     }
 }
